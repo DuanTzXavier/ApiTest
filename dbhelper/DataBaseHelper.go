@@ -4,13 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"container/list"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
 	dbHsotIP  	= "(127.0.0.1:3306)"//IP地址
-	dbUserName 	= "root"//用户名
-	dbPassword 	= "123456"//密码
-	dbName     	= "Test"//表名
+	dbUserName 	= "readingin"//用户名
+	dbPassword 	= "soccer"//密码
+	dbName     	= "users"//数据库名
 )
 
 func Printxx() {
@@ -38,6 +39,22 @@ func insert(tableName string, insertData list.List) string {
 	fmt.Println(affect)
 
 	return ""
+}
+
+func QuireData() {
+	var sourceName = dbUserName + ":" + dbPassword + "@tcp" + dbHsotIP + "/" + dbName + "?charset=utf8";
+	db, err := sql.Open("mysql", sourceName)
+	checError(err)
+
+	rows, err := db.Query("SELECT user_id FROM users_base_info")
+	checError(err)
+
+	for rows.Next() {
+		var uid string
+		err = rows.Scan(&uid)
+		checError(err)
+		fmt.Println(uid)
+	}
 }
 
 func checError(err error) {

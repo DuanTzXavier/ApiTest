@@ -7,5 +7,5 @@ import (
 
 func main() {
 	fmt.Print("hello world")
-	dbhelper.Printxx()
+	dbhelper.QuireData()
 }
