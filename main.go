@@ -6,6 +6,12 @@ import (
 )
 
 func main() {
-	fmt.Print("hello world")
-	dbhelper.QuireData()
+	fmt.Print("Hello World\n")
+	//dbhelper.QuireData()
+	var s []string
+	s = append(s, "user_name")
+	var b []string
+	b = append(b, "FirstUser")
+
+	fmt.Print(dbhelper.QueryBySql(s, "users_base_info", s, b))
 }
