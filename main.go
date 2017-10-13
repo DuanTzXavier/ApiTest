@@ -19,7 +19,9 @@ func main() {
 	t.User_Name = "name"
 	t.User_Avatar = "avator"
 	t.User_Status = 1
-	dbhelper.InsertData("users_base_info", &t)
+
+	dbhelper.DeleteData("users_base_info", s, b)
+	//dbhelper.InsertData("users_base_info", &t)
 	//fmt.Print(dbhelper.BuildInsertCommand("users_base_info", &t))
 	result := dbhelper.QueryData("users_base_info", nil, nil, &t)
 

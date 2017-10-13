@@ -60,7 +60,7 @@ func InsertData(tableName string, field interface{}) {
 	checError(err)
 	defer db.Close()
 
-	stmt, err := db.Prepare(BuildInsertCommand(tableName, field))
+	stmt, err := db.Prepare(buildInsertCommand(tableName, field))
 	checError(err)
 	defer stmt.Close()
 
@@ -70,19 +70,45 @@ func InsertData(tableName string, field interface{}) {
 	for i := 0; i < leng; i++ {
 		d = append(d, s.Field(i).Interface())
 	}
-	//for _, value := range filterValue {
-	//	d = append(d, value)
-	//}
+
+	_, err = stmt.Exec(d...)
+	checError(err)
+}
+
+func DeleteData(tableName string, filterField []string, filterValue []string,) {
+	db, err := sql.Open("mysql", connectString)
+	checError(err)
+	defer db.Close()
+
+	stmt, err := db.Prepare(buildDeleteCommand(tableName, filterField))
+	checError(err)
+	defer stmt.Close()
+
+	var d []interface{}
+	for _, value := range filterValue{
+		d = append(d, value)
+	}
+
 	res, err := stmt.Exec(d...)
 	checError(err)
 
-	id, err := res.LastInsertId()
+	affect, err := res.RowsAffected()
 	checError(err)
 
-	fmt.Println(id)
+	fmt.Println(affect)
 }
 
-func BuildInsertCommand(tableName string, field interface{}) string {
+func buildDeleteCommand(tableName string, filterField []string) string {
+	var deleteCommand string
+	deleteCommand += "DELETE FROM " + tableName + " WHERE "
+	for _, value := range filterField {
+		deleteCommand += value + "=? ,"
+	}
+	deleteCommand = strings.TrimRight(deleteCommand, ",")
+	return deleteCommand
+}
+
+func buildInsertCommand(tableName string, field interface{}) string {
 	var insertCommand string
 	insertCommand += "INSERT " + tableName + " SET "
 	s := reflect.ValueOf(field).Elem()
