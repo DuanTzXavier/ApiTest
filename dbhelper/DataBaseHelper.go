@@ -9,6 +9,12 @@ import (
 	"reflect"
 )
 
+const (
+	UPDATE = 2
+	DELETE = 3
+)
+
+
 var (
 	dbHsotIP  	= "(127.0.0.1:3306)"//IP地址
 	dbUserName 	= "readingin"//用户名
@@ -19,6 +25,29 @@ var (
 
 func Printxx() {
 
+}
+
+func ProcessSQL(commandType int, tableName string, filterField []string, filterValue []string){
+	db, err := sql.Open("mysql", connectString)
+	checError(err)
+	defer db.Close()
+
+	stmt, err := db.Prepare(buildCommand(commandType, tableName, filterField))
+	checError(err)
+	defer stmt.Close()
+
+	var d []interface{}
+	for _, value := range filterValue{
+		d = append(d, value)
+	}
+
+	res, err := stmt.Exec(d...)
+	checError(err)
+
+	affect, err := res.RowsAffected()
+	checError(err)
+
+	fmt.Println(affect)
 }
 
 func insert(tableName string, insertData list.List) string {
@@ -75,7 +104,7 @@ func InsertData(tableName string, field interface{}) {
 	checError(err)
 }
 
-func DeleteData(tableName string, filterField []string, filterValue []string,) {
+func DeleteData(tableName string, filterField []string, filterValue []string) {
 	db, err := sql.Open("mysql", connectString)
 	checError(err)
 	defer db.Close()
@@ -98,6 +127,47 @@ func DeleteData(tableName string, filterField []string, filterValue []string,) {
 	fmt.Println(affect)
 }
 
+func UpdateData(tableName string, setField []string, filterField []string, value []string,) {
+	db, err := sql.Open("mysql", connectString)
+	checError(err)
+	defer db.Close()
+
+	stmt, err := db.Prepare(buildUpdataCommand(tableName, setField, filterField))
+	checError(err)
+	defer stmt.Close()
+
+	var d []interface{}
+	for _, value := range value{
+		d = append(d, value)
+	}
+
+	res, err := stmt.Exec(d...)
+	checError(err)
+
+	affect, err := res.RowsAffected()
+	checError(err)
+
+	fmt.Println(affect)
+}
+func buildUpdataCommand(tableName string, setField []string, filterField []string) string {
+	var command string
+	command += "UPDATE " + tableName + " SET "
+
+	for _, value := range setField {
+		command += value + "=? ,"
+	}
+
+	command = strings.TrimRight(command, ",")
+	command += " WHERE "
+
+	for _, value := range filterField {
+		command += value + "=? ,"
+	}
+	command = strings.TrimRight(command, ",")
+
+	return command
+}
+
 func buildDeleteCommand(tableName string, filterField []string) string {
 	var deleteCommand string
 	deleteCommand += "DELETE FROM " + tableName + " WHERE "
@@ -106,6 +176,25 @@ func buildDeleteCommand(tableName string, filterField []string) string {
 	}
 	deleteCommand = strings.TrimRight(deleteCommand, ",")
 	return deleteCommand
+}
+
+func buildCommand(commandType int, tableName string, filterField []string) string {
+	var command string
+	switch commandType {
+		case UPDATE:
+			command += "UPDATE " + tableName + " SET "
+		case DELETE:
+			command += "DELETE FROM " + tableName + " WHERE "
+		default:
+
+	}
+
+	for _, value := range filterField {
+		command += value + "=? ,"
+	}
+	command = strings.TrimRight(command, ",")
+
+	return command
 }
 
 func buildInsertCommand(tableName string, field interface{}) string {

@@ -12,7 +12,11 @@ func main() {
 	var s []string
 	s = append(s, "user_id")
 	var b []string
-	b = append(b, "123")
+	b = append(b, "user_id")
+
+	var c []string
+	c = append(c, "123")
+	c = append(c, "asa")
 
 	var t dbStructure.UserBaseInfox
 	t.User_ID = "asa"
@@ -20,7 +24,7 @@ func main() {
 	t.User_Avatar = "avator"
 	t.User_Status = 1
 
-	dbhelper.DeleteData("users_base_info", s, b)
+	dbhelper.UpdateData("users_base_info", s, b, c)
 	//dbhelper.InsertData("users_base_info", &t)
 	//fmt.Print(dbhelper.BuildInsertCommand("users_base_info", &t))
 	result := dbhelper.QueryData("users_base_info", nil, nil, &t)
