@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"container/list"
 	_ "github.com/go-sql-driver/mysql"
-	//"reflect"
 	"strings"
+	"reflect"
 )
 
 var (
@@ -63,14 +63,14 @@ func QuireData() {
 	}
 }
 
-func QueryBySql(selectField []string, tableName string, filterField []string, filterValue []string) *[]interface{} {
-	query := buildQueryCommand(selectField, tableName, filterField)
+func QueryBySql(tableName string, filterField []string, filterValue []string, struc interface{}) *[]interface{} {
+	query := buildQueryCommand(tableName, filterField)
 	var d []interface{}
-	for index, value := range filterValue {
-		fmt.Print(index)
+	for _, value := range filterValue {
 		d = append(d, value)
 	}
-	return processQueryCommand(query, selectField, d...)
+
+	return processQueryCommand(query, struc, d...)
 }
 
 func processQueryCommand(query string, struc interface{}, cond ...interface{}) *[]interface{} {
@@ -87,49 +87,31 @@ func processQueryCommand(query string, struc interface{}, cond ...interface{}) *
 	defer rows.Close()
 
 	result := make([]interface{}, 0)
-	//s := reflect.ValueOf(struc).Elem()
-	//leng := s.NumField()
-	//onerow := make([]interface{}, leng)
-	//for i := 0; i < leng; i++ {
-	//	onerow[i] = s.Field(i).Addr().Interface()
-	//}
-	var uid string
+
+	s := reflect.ValueOf(struc).Elem()
+	leng := s.NumField()
+	onerow := make([]interface{}, leng)
+	for i := 0; i < leng; i++ {
+		onerow[i] = s.Field(i).Addr().Interface()
+	}
 	for rows.Next() {
-		err = rows.Scan(&uid)
+		err = rows.Scan(onerow...)
 		if err != nil {
 			panic(err)
 		}
-		result = append(result, uid)
+		result = append(result, s.Interface())
 	}
 
 	return &result
 }
 
-func buildQueryCommand(selectField []string, tableName string, filterField []string) string {
+func buildQueryCommand(tableName string, filterField []string) string {
 	var queryCommand string
-	queryCommand = "SELECT "
-	if selectField == nil {
-		queryCommand += "*"
-	}else {
-		queryCommand += buildSelectField(selectField)
-	}
-	queryCommand += " FROM " + tableName + " WHERE "
-
+	queryCommand += "SELECT * FROM " + tableName + " WHERE "
 	if filterField != nil {
 		queryCommand += buildFilterField(filterField)
 	}
 	return queryCommand
-}
-
-func buildSelectField(selectFields []string) string{
-	var result string
-	for i := 0; i < len(selectFields); i++ {
-		result += selectFields[i] + ","
-	}
-
-	result = strings.TrimRight(result, ",")
-
-	return result
 }
 
 func buildFilterField(filterField []string) string{
