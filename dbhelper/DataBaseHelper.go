@@ -45,25 +45,7 @@ func insert(tableName string, insertData list.List) string {
 	return ""
 }
 
-func QuireData() {
-	db, err := sql.Open("mysql", connectString)
-	checError(err)
-	defer db.Close()
-
-	rows, err := db.Query("SELECT user_id FROM users_base_info")
-	checError(err)
-	defer rows.Close()
-
-	for rows.Next() {
-		var uid string
-		err = rows.Scan(&uid)
-		checError(err)
-		fmt.Println(uid)
-		fmt.Print(rows.Columns())
-	}
-}
-
-func QueryBySql(tableName string, filterField []string, filterValue []string, struc interface{}) *[]interface{} {
+func QueryData(tableName string, filterField []string, filterValue []string, struc interface{}) *[]interface{} {
 	query := buildQueryCommand(tableName, filterField)
 	var d []interface{}
 	for _, value := range filterValue {
@@ -73,12 +55,52 @@ func QueryBySql(tableName string, filterField []string, filterValue []string, st
 	return processQueryCommand(query, struc, d...)
 }
 
+func InsertData(tableName string, field interface{}) {
+	db, err := sql.Open("mysql", connectString)
+	checError(err)
+	defer db.Close()
+
+	stmt, err := db.Prepare(BuildInsertCommand(tableName, field))
+	checError(err)
+	defer stmt.Close()
+
+	var d []interface{}
+	s := reflect.ValueOf(field).Elem()
+	leng := s.NumField()
+	for i := 0; i < leng; i++ {
+		d = append(d, s.Field(i).Interface())
+	}
+	//for _, value := range filterValue {
+	//	d = append(d, value)
+	//}
+	res, err := stmt.Exec(d...)
+	checError(err)
+
+	id, err := res.LastInsertId()
+	checError(err)
+
+	fmt.Println(id)
+}
+
+func BuildInsertCommand(tableName string, field interface{}) string {
+	var insertCommand string
+	insertCommand += "INSERT " + tableName + " SET "
+	s := reflect.ValueOf(field).Elem()
+	leng := s.NumField()
+	for i := 0; i < leng; i++ {
+		insertCommand += strings.ToLower(s.Type().Field(i).Name) + "=? ,"
+	}
+	insertCommand = strings.TrimRight(insertCommand, ",")
+	return insertCommand
+}
+
 func processQueryCommand(query string, struc interface{}, cond ...interface{}) *[]interface{} {
 	db, err := sql.Open("mysql", connectString)
 	checError(err)
 	defer db.Close()
 
 	stmt, err := db.Prepare(query)
+	//stmt, err := db.Prepare("SELECT * FROM users_base_info")
 	checError(err)
 	defer stmt.Close()
 
@@ -107,7 +129,7 @@ func processQueryCommand(query string, struc interface{}, cond ...interface{}) *
 
 func buildQueryCommand(tableName string, filterField []string) string {
 	var queryCommand string
-	queryCommand += "SELECT * FROM " + tableName + " WHERE "
+	queryCommand += "SELECT * FROM " + tableName
 	if filterField != nil {
 		queryCommand += buildFilterField(filterField)
 	}
@@ -116,7 +138,7 @@ func buildQueryCommand(tableName string, filterField []string) string {
 
 func buildFilterField(filterField []string) string{
 	var result string
-
+	result += " WHERE "
 	for i := 0; i < len(filterField); i++ {
 		result += filterField[i] + "=?" + " AND "
 	}

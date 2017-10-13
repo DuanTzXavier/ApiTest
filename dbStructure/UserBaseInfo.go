@@ -3,14 +3,14 @@ package dbStructure
 import "database/sql"
 
 type UserBaseInfox struct {
-	Id 				string
-	Name 			string
-	Avator 			string
-	Password		sql.NullString
-	Phone			sql.NullString
-	WechatID		sql.NullString
-	WechatToken		sql.NullString
-	PasswordHash	sql.NullString
-	Token			sql.NullString
-	Status			int
+	User_ID 			string
+	User_Name 			string
+	User_Avatar 		string
+	User_Password		sql.NullString
+	User_Phone			sql.NullString
+	User_Wechat_ID		sql.NullString
+	User_Wechat_Token	sql.NullString
+	User_Password_Hash	sql.NullString
+	User_Token			sql.NullString
+	User_Status			int
 }
