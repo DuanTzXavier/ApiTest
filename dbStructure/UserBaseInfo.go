@@ -2,7 +2,7 @@ package dbStructure
 
 import "database/sql"
 
-type UserBaseInfox struct {
+type UserBaseInfo struct {
 	User_ID 			string
 	User_Name 			string
 	User_Avatar 		string
