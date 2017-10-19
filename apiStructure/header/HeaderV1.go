@@ -1,10 +1,10 @@
 package header
 
 type HeaderV1 struct {
-	EnCoding int
-	Platform int
-	UserID string
-	ClientID	string
-	ServiceVersion int
-	Authorization string
+	EnCoding 		string
+	Platform 		string
+	UserID 			string
+	ClientID		string
+	ServiceVersion 	string
+	Authorization 	string
 }

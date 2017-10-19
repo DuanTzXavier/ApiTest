@@ -8,17 +8,28 @@ import (
 	"log"
 	"strings"
 	"encoding/json"
+	"ApiTest/processAPI"
 )
 
 func main() {
 	fmt.Print("Hello World\n")
 
-	http.HandleFunc("/api", TestServer)
+	//http.HandleFunc("/api", TestServer)
+	//err := http.ListenAndServe("localhost:8001", nil)
+	//if err != nil {
+	//	log.Fatal("ListenAndServe: ", err.Error())
+	//}
+
+	http.HandleFunc("/essay", GetEssayServer)
 	err := http.ListenAndServe("localhost:8001", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}
 
+}
+
+func GetEssayServer(writer http.ResponseWriter, request *http.Request) {
+	processAPI.ProcessHeader(request.Header)
 }
 func TestServer(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("Inside HelloServer handler")
