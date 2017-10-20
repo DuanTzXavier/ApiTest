@@ -8,7 +8,7 @@ import (
 )
 
 func ProcessHeader(header http.Header) {
-	var requestHeader header2.HeaderV1
+	var requestHeader header2.RequestHeaderV1
 
 	object := reflect.ValueOf(&requestHeader)
 	fields := object.Elem()

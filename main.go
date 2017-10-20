@@ -1,14 +1,15 @@
 package main
 
 import (
-	"ApiTest/dbhelper"
+	"ApiTest/db/dbhelper"
 	"fmt"
-	"ApiTest/dbStructure"
+	"ApiTest/db/dbStructure"
 	"net/http"
 	"log"
 	"strings"
 	"encoding/json"
 	"ApiTest/processAPI"
+	"ApiTest/apiStructure/readingIN"
 )
 
 func main() {
@@ -21,15 +22,29 @@ func main() {
 	//}
 
 	http.HandleFunc("/essay", GetEssayServer)
+	http.HandleFunc("/essay/", GetEssayByIDServer)
+
+	http.HandleFunc("/essay/{}/server", GetEssayByIDServer)
 	err := http.ListenAndServe("localhost:8001", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}
 
 }
+func GetEssayByIDServer(writer http.ResponseWriter, request *http.Request) {
+	processAPI.ProcessHeader(request.Header)
+	fmt.Print(request.URL.Path)
+}
 
 func GetEssayServer(writer http.ResponseWriter, request *http.Request) {
 	processAPI.ProcessHeader(request.Header)
+	var param readingIN.GETEssayResponse
+	param.NextID = "123"
+	b, err := json.Marshal(param)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Fprintf(writer, string(b))
 }
 func TestServer(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("Inside HelloServer handler")

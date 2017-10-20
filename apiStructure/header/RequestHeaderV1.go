@@ -1,6 +1,6 @@
 package header
 
-type HeaderV1 struct {
+type RequestHeaderV1 struct {
 	EnCoding 		string
 	Platform 		string
 	UserID 			string
