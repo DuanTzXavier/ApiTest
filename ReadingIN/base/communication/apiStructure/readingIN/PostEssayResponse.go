@@ -1,6 +1,6 @@
 package readingIN
 
 type PostEssayResponse struct {
-	ResultMessage		string
-	ResultCode		string
+	ResultMessage	string
+	ResultCode		int
 }

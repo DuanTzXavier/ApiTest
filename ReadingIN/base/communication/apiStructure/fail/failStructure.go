@@ -1,6 +1,6 @@
 package fail
 
 type FailStructure struct {
-	ResultMessage		string
-	ResultCode		string
+	ResultMessage	string
+	ResultCode		int
 }

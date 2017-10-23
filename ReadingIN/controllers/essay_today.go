@@ -8,6 +8,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"io"
+	"crypto/rand"
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/base64"
 )
 
 type EssayToday struct {
@@ -17,8 +22,23 @@ type EssayToday struct {
 func (c *EssayToday) Post() {
 	var postEssayRequest readingIN.PostEssayRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &postEssayRequest)
+	var essaysInfo readingIN2.EssaysInfo
 
-	c.Data["json"] = "{\"ObjectId\":\"\"}"
+	b := make([]byte, 48)
+
+	if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		return
+	}
+
+	h := md5.New()
+	h.Write([]byte(base64.URLEncoding.EncodeToString(b)))
+	essaysInfo.Essay_ID = hex.EncodeToString(h.Sum(nil))
+
+	dbhelper.InsertData("essays_info", essaysInfo)
+	var resultMsg readingIN.PostEssayResponse
+	resultMsg.ResultCode = 0
+	resultMsg.ResultMessage = "保存成功"
+	c.Data["json"] = resultMsg
 	c.ServeJSON()
 }
 
