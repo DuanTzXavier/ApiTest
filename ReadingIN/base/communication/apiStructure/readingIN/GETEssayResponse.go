@@ -4,7 +4,7 @@ type GETEssayResponse struct {
 	NextID string
 	PreviousID string
 	EssayName string
-	EssayContent string
+	EssayContents []EssayContent
 	EssayAuthor string
 	EssayWordsCount int
 	EssayFrom string
