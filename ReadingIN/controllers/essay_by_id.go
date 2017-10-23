@@ -5,37 +5,36 @@ import (
 	"ApiTest/ReadingIN/base/communication/apiStructure/readingIN"
 	"ApiTest/ReadingIN/base/db/dbhelper"
 	readingIN2 "ApiTest/ReadingIN/base/db/dbStructure/readingIN"
-	"encoding/json"
-	"fmt"
 	"strconv"
+	"ApiTest/ReadingIN/base/communication/apiStructure/fail"
 )
 
-type EssayToday struct {
+type EssayByID struct {
 	beego.Controller
 }
 
-func (c *EssayToday) Post() {
-	var postEssayRequest readingIN.PostEssayRequest
-	json.Unmarshal(c.Ctx.Input.RequestBody, &postEssayRequest)
+func (c *EssayByID) Get() {
+	var filterField []string
+	filterField = append(filterField, "essay_id")
+	var filterValue []string
+	filterValue = append(filterValue, c.Ctx.Input.Param(":id"))
 
-	c.Data["json"] = "{\"ObjectId\":\"\"}"
-	c.ServeJSON()
-}
-
-func (c *EssayToday) Get() {
 	var essaysInfo readingIN2.EssaysInfo
-	resultSlice := dbhelper.QueryData("essays_info", nil, nil, &essaysInfo)
+	resultSlice := dbhelper.QueryData("essays_info", filterField, filterValue, &essaysInfo)
 	if len(*resultSlice) > 0 {
 		for _, value := range *resultSlice{
 			interfaceToStruct(value, &essaysInfo)
 		}
+	}else {
+		var failMsg fail.FailStructure
+		failMsg.ResultMessage = "文章丢失啦"
+		failMsg.ResultCode = "1404"
+		c.Data["json"] = failMsg
+		c.ServeJSON()
+		return
 	}
 
 	var dbEssayContent readingIN2.EssaysContents
-	var filterField []string
-	filterField = append(filterField, "essay_id")
-	var filterValue []string
-	filterValue = append(filterValue, essaysInfo.Essay_ID)
 	resultSlice = dbhelper.QueryData("essays_contents", filterField, filterValue, &dbEssayContent)
 
 	var essayContents []readingIN.EssayContent
@@ -52,11 +51,17 @@ func (c *EssayToday) Get() {
 
 			essayContents = append(essayContents, essayContent)
 		}
+	}else {
+		var failMsg fail.FailStructure
+		failMsg.ResultMessage = "文章丢失啦"
+		failMsg.ResultCode = "1405"
+		c.Data["json"] = failMsg
+		c.ServeJSON()
+		return
 	}
 	var param readingIN.GETEssayResponse
 	param.NextID = essaysInfo.Essay_ID
 	param.EssayAuthor = essaysInfo.Essay_Author
-
 	param.EssayContents = essayContents
 	param.EssayFrom = essaysInfo.Essay_From
 	param.EssayWordsCount, _ = strconv.Atoi(essaysInfo.Essay_Words_Count)
@@ -64,16 +69,5 @@ func (c *EssayToday) Get() {
 	c.Data["json"] = param
 
 	c.ServeJSON()
-}
-
-func interfaceToStruct(from interface{}, toStruct interface{})  {
-	b, err := json.Marshal(from)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	err = json.Unmarshal(b, toStruct)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
 }
 
