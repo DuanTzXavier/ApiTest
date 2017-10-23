@@ -11,4 +11,5 @@ type EssaysInfo struct {
 	Essay_Creat_Time 	string
 	Essay_Status		int
 	Essay_Tags 			sql.NullString
+	Essay_Content		string
 }

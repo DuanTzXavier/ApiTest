@@ -2,9 +2,9 @@ package parseAPI
 
 import (
 	"net/http"
-	header2 "ApiTest/base/communication/apiStructure/header"
 	"reflect"
 	"fmt"
+	header2 "ApiTest/ReadingIN/base/communication/apiStructure/header"
 )
 
 func ParseHeader(header http.Header) {

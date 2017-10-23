@@ -19,7 +19,7 @@ var (
 	dbHsotIP  	= "(127.0.0.1:3306)"//IP地址
 	dbUserName 	= "readingin"//用户名
 	dbPassword 	= "soccer"//密码
-	dbName     	= "users"//数据库名
+	dbName     	= "reading_in"//数据库名
 	connectString = dbUserName + ":" + dbPassword + "@tcp" + dbHsotIP + "/" + dbName + "?charset=utf8"
 )
 

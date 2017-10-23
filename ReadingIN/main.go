@@ -6,7 +6,6 @@ import (
 )
 
 func main() {
-	beego.SetViewsPath("ReadingIN/views")
 	beego.Run()
 }
 
