@@ -16,7 +16,7 @@ const (
 
 
 var (
-	dbHsotIP  	= "(127.0.0.1:3306)"//IP地址
+	dbHsotIP  	= "(116.196.125.155:3306)"//IP地址
 	dbUserName 	= "readingin"//用户名
 	dbPassword 	= "soccer"//密码
 	dbName     	= "reading_in"//数据库名
