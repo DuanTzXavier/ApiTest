@@ -86,7 +86,7 @@ func (c *EssayToday) Get() {
 
 	param.EssayContents = essayContents
 	param.EssayFrom = essaysInfo.Essay_From
-	param.EssayWordsCount, _ = strconv.Atoi(essaysInfo.Essay_Words_Count)
+	param.EssayWordsCount = essaysInfo.Essay_Words_Count
 	param.EssayName = essaysInfo.Essay_Name
 	c.Data["json"] = param
 

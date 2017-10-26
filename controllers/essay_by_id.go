@@ -5,7 +5,6 @@ import (
 	"ReadingIN/base/communication/apiStructure/readingIN"
 	"ReadingIN/base/db/dbhelper"
 	readingIN2 "ReadingIN/base/db/dbStructure/readingIN"
-	"strconv"
 	"ReadingIN/base/communication/apiStructure/fail"
 )
 
@@ -64,7 +63,7 @@ func (c *EssayByID) Get() {
 	param.EssayAuthor = essaysInfo.Essay_Author
 	param.EssayContents = essayContents
 	param.EssayFrom = essaysInfo.Essay_From
-	param.EssayWordsCount, _ = strconv.Atoi(essaysInfo.Essay_Words_Count)
+	param.EssayWordsCount = essaysInfo.Essay_Words_Count
 	param.EssayName = essaysInfo.Essay_Name
 	c.Data["json"] = param
 
