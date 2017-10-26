@@ -8,11 +8,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"io"
-	"crypto/rand"
-	"crypto/md5"
-	"encoding/hex"
-	"encoding/base64"
+	"ReadingIN/base"
+	"time"
 )
 
 type EssayToday struct {
@@ -24,17 +21,27 @@ func (c *EssayToday) Post() {
 	json.Unmarshal(c.Ctx.Input.RequestBody, &postEssayRequest)
 	var essaysInfo readingIN2.EssaysInfo
 
-	b := make([]byte, 48)
-
-	if _, err := io.ReadFull(rand.Reader, b); err != nil {
-		return
-	}
-
-	h := md5.New()
-	h.Write([]byte(base64.URLEncoding.EncodeToString(b)))
-	essaysInfo.Essay_ID = hex.EncodeToString(h.Sum(nil))
-
+	essaysInfo.Essay_ID 		= base.GenerateUniqueCode(10)
+	essaysInfo.Essay_Name 		= postEssayRequest.EssayName
+	essaysInfo.Essay_Words_Count= 100 //TODO 自动计算Content值
+	essaysInfo.Essay_From 		= postEssayRequest.EssayFrom
+	essaysInfo.Essay_Author 	= postEssayRequest.EssayAuthor
+	essaysInfo.Essay_Creat_Time = strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
+	essaysInfo.Essay_Status		= 0
+	//essaysInfo.Essay_Tags
 	dbhelper.InsertData("essays_info", essaysInfo)
+
+	var essayContent readingIN2.EssaysContents
+
+	essayContent.Essay_ID			= essaysInfo.Essay_ID
+	essayContent.Content_ID 		= base.GenerateUniqueCode(10)
+	essayContent.Content_Name		= ""
+	essayContent.Content			= postEssayRequest.EssayContents
+	essayContent.Content_Bit_Map	= 0
+	essayContent.Content_Serial		= 0
+
+	dbhelper.InsertData("essays_contents", essayContent)
+
 	var resultMsg readingIN.PostEssayResponse
 	resultMsg.ResultCode = 0
 	resultMsg.ResultMessage = "保存成功"
